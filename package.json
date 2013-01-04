@@ -2,6 +2,11 @@
   "name": "flutter",
   "version": "0.0.1",
   "dependencies": {
-    "solr-client": "*"
+    "solr-client": "*",
+    "coffee-script": "*",
+    "lazy": "*",
+    "debug": "*",
+    "mongoose": "*",
+    "async": "*"
   }
 }
