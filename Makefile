@@ -13,4 +13,9 @@ wipe-solr:
 		DEBUG=wipe-solr \
 		coffee wipe_solr.coffee
 
+server:
+	NODE_PATH=. \
+		DEBUG=server \
+		coffee server.coffee
+
 .PHONY: load

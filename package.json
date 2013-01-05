@@ -9,6 +9,7 @@
     "mongoose": "*",
     "async": "*",
     "string": "*",
-    "node-expat": "*"
+    "node-expat": "*",
+    "express": "*"
   }
 }
