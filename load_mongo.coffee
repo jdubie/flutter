@@ -8,11 +8,13 @@ path     = require 'path'
 debug    = require 'debug'
 async    = require 'async'
 mongoose = require 'mongoose'
+expat    = require 'node-expat'
+S        = require 'string'
 Lazy     = require 'lazy'
 Company  = require 'models/company'
 
 CRUNCHBASE_FILE = path.join('data', 'cbase.ndj')
-debug = debug('load')
+debug = debug('load_mongo')
 
 # connect to db
 mongoose.connect('mongodb://localhost/cbase')
@@ -20,15 +22,26 @@ mongoose.connect('mongodb://localhost/cbase')
 lineNum = 0
 companies = []
 
+parseHTML = (overview) ->
+  p = expat.createParser()
+  textChunks = []
+  p.on 'text', (text) -> textChunks.push(text)
+  p.parse(overview)
+  textChunks.join('')
+
 createCompany = (company, callback) ->
   debug 'creating', company.permalink
+
+  # tags
   tags = company.tag_list?.split(', ')
   tags = tags.map (tag) -> tag.trim()
-  debug 'tags', tags
   company.tags = tags
+
+  # overview 
+  company.overview = parseHTML(company.overview)
+
   company = new Company(company)
   company.save(callback)
-
 
 stream = fs.createReadStream(CRUNCHBASE_FILE)
 stream.on 'end', ->
@@ -39,7 +52,7 @@ stream.on 'end', ->
         debug 'error', err
       else
         debug 'success'
-        process.exit()
+        mongoose.connection.close()
 
 PERMALINKS = [
   'orchestra'
@@ -47,14 +60,6 @@ PERMALINKS = [
   'google'
   'microsoft'
 ]
-
-#getCompany = (companyJSON, callback) ->
-#  Company.findOne permalink: companyJSON.permalink, (err, company) ->
-#    debug 'getCompany'
-#    process.exit()
-#    if company is null
-#      company = new Company(companyJSON)
-#    callback(err, company)
 
 new Lazy(stream)
   .lines
@@ -67,9 +72,3 @@ new Lazy(stream)
 
     if companyJSON?.permalink in PERMALINKS
       companies.push companyJSON
-
-      #getCompany companyJSON, (err, company) ->
-      #  if err
-      #    debug 'error', err
-      #  debug 'company', company
-        #company.save()

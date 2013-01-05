@@ -6,9 +6,15 @@ debug = debug('company')
 schema = mongoose.Schema
   permalink: type: String, unique: true
   tags: [String]
+  name: String
+  overview: String
 
-schema.post 'init', (doc) ->
-  process.exit()
-  debug('%s has been initialized from the db', doc._id)
+schema.virtual('id').get () ->
+  this.permalink
+
+schema.virtual('cat').get () ->
+  this.tags
+
+schema.set('toJSON', virtuals: true)
 
 module.exports = mongoose.model('Company', schema)
