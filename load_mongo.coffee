@@ -30,15 +30,17 @@ parseHTML = (overview) ->
   textChunks.join('')
 
 createCompany = (company, callback) ->
-  debug 'creating', company.permalink
+  #debug 'creating', company.permalink
 
   # tags
-  tags = company.tag_list?.split(', ')
-  tags = tags.map (tag) -> tag.trim()
-  company.tags = tags
+  if company.tag_list?.length > 0
+    tags = company.tag_list?.split(', ')
+    tags = tags.map (tag) -> tag.trim()
+    company.tags = tags
 
   # overview 
-  company.overview = parseHTML(company.overview)
+  if company.overview
+    company.overview = parseHTML(company.overview)
 
   company = new Company(company)
   company.save(callback)
@@ -54,13 +56,6 @@ stream.on 'end', ->
         debug 'success'
         mongoose.connection.close()
 
-PERMALINKS = [
-  'orchestra'
-  'pulse'
-  'google'
-  'microsoft'
-]
-
 new Lazy(stream)
   .lines
   .forEach (line) ->
@@ -70,5 +65,5 @@ new Lazy(stream)
     catch e
       debug "#{lineNum}: BAD"
 
-    if companyJSON?.permalink in PERMALINKS
+    if companyJSON?.permalink
       companies.push companyJSON
