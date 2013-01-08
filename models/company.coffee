@@ -17,12 +17,18 @@ schema = mongoose.Schema
     funded_month: Number
     funded_day: Number
   }]
+  image:
+    available_sizes: []
 
 schema.virtual('id').get () ->
   @permalink
 
+schema.virtual('small_image_s').get () ->
+  @image?.available_sizes?[0]?[1]
+
 schema.virtual('cat').get () ->
   @tags
+
 schema.virtual('overview_s').get () ->
   @overview
 
@@ -36,7 +42,7 @@ schema.virtual('funding').get () ->
   result
 
 schema.methods.toSolr = () ->
-  _.extend {@id, @name, @cat, description: @overview}, @funding
+  _.extend {@small_image_s, @id, @name, @cat, description: @overview}, @funding
 
 schema.set('toJSON', virtuals: true)
 

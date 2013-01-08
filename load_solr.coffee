@@ -26,8 +26,11 @@ Company
   .find()
   .exec (err, companies) ->
     mongoose.connection.close()
-    companies = companies.map (company) -> company.toSolr()
-    debug 'companies', companies
+    if err
+      debug 'error', err
+    else
+      companies = companies.map (company) -> company.toSolr()
+      debug 'companies', companies
 
-    ## Add documents
-    client.add(companies, callback)
+      # Add documents
+      client.add(companies, callback)
