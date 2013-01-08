@@ -13,17 +13,16 @@ client = solr.createClient
 client.autoCommit = true
 
 app.get '/companys', (req, res) ->
-  query = req.query.q
-  debug 'query', query
+  {q, lower, upper} = req.query
 
   # DixMax query
   solrQuery = client.createQuery()
-    .q(query)
-    .dismax()
-    #.qf({title_t : 0.2 , description_t : 3.3})
-    #.mm(2)
-    #.start(0)
-    #.rows(10);
+    .q(q)
+    .start(0)
+    .rows(10)
+    .rangeFilter(field: 'funding_date_dts', start: "NOW-#{lower}YEAR", end: "NOW-#{upper}YEAR")
+    .sort('score desc')
+
   client.search solrQuery, (err, solrRes) ->
     if err
       console.log(err)
