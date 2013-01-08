@@ -26,8 +26,7 @@ Company
   .find()
   .exec (err, companies) ->
     mongoose.connection.close()
-    companies = companies.map (company) -> company.toJSON()
-    companies = companies.map ({name, id, cat, overview}) -> {name, description: overview, id, cat}
+    companies = companies.map (company) -> company.toSolr()
     debug 'companies', companies
 
     ## Add documents
