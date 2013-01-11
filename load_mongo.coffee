@@ -13,6 +13,7 @@ S        = require 'string'
 Lazy     = require 'lazy'
 Company  = require 'models/company'
 
+#CRUNCHBASE_FILE = path.join('data', 'cbase_small.ndj')
 CRUNCHBASE_FILE = path.join('data', 'cbase.ndj')
 debug = debug('load_mongo')
 
@@ -29,41 +30,51 @@ parseHTML = (overview) ->
   p.parse(overview)
   textChunks.join('')
 
-createCompany = (company, callback) ->
-  #debug 'creating', company.permalink
+beingCreated = 0
+created = 0
 
-  # tags
-  if company.tag_list?.length > 0
-    tags = company.tag_list?.split(', ')
-    tags = tags.map (tag) -> tag.trim()
-    company.tags = tags
+callback = ->
 
-  # overview 
-  if company.overview
-    company.overview = parseHTML(company.overview)
+createCompany = (line) ->
 
-  company = new Company(company)
-  company.save(callback)
+  try
+    company = JSON.parse(line)
+  catch e
+    debug "#{lineNum}: BAD"
+
+  if company?.permalink
+
+    # tags
+    if company.tag_list?.length > 0
+      tags = company.tag_list?.split(', ')
+      tags = tags.map (tag) -> tag.trim()
+      company.tags = tags
+
+    # overview 
+    if company.overview
+      company.overview = parseHTML(company.overview)
+
+    company = new Company(company)
+    company.save(callback)
+  else
+    callback()
 
 stream = fs.createReadStream(CRUNCHBASE_FILE)
 stream.on 'end', ->
-  debug 'PARSED'
-  Company.remove {}, ->
-    async.map companies, createCompany, (err) ->
-      if err
-        debug 'error', err
-      else
-        debug 'success'
-      mongoose.connection.close()
+  callback = ->
+    debug 'success'
+    mongoose.connection.close()
 
-new Lazy(stream)
-  .lines
-  .forEach (line) ->
-    lineNum++
-    try
-      companyJSON = JSON.parse(line)
-    catch e
-      debug "#{lineNum}: BAD"
+Company.remove {}, ->
+  lazy = new Lazy(stream)
+  lazy.lines
+    .forEach (line) ->
+      beingCreated++
+      createCompany(line)
 
-    if companyJSON?.permalink
-      companies.push companyJSON
+#async.map lazy, createCompany, (err) ->
+#  if err
+#    debug 'error', err
+#  else
+#    debug 'success'
+#    mongoose.connection.close()
