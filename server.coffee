@@ -15,7 +15,6 @@ client.autoCommit = true
 app.get '/companys', (req, res) ->
   {q, lower, upper} = req.query
 
-  # DixMax query
   solrQuery = client.createQuery()
     .q(q)
     .start(0)

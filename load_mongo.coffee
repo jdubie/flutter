@@ -54,7 +54,7 @@ stream.on 'end', ->
         debug 'error', err
       else
         debug 'success'
-        mongoose.connection.close()
+      mongoose.connection.close()
 
 new Lazy(stream)
   .lines
