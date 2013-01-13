@@ -14,8 +14,11 @@ callback = (err, res) ->
     process.exit()
 
 # connect to solr
-client = solr.createClient
-  host: config.HOST
+if config.HOST is 'localhost'
+  client = solr.createClient()
+else
+  client = solr.createClient
+    host: '192.168.144.1'
 
 query = '*:*'
 client.deleteByQuery(query, callback)

@@ -2,14 +2,18 @@ express = require 'express'
 debug   = require 'debug'
 path    = require 'path'
 solr    = require 'solr-client'
+config  = require 'config'
 
 debug = debug('server')
 
 app = express()
 app.use express.static path.join(__dirname, 'public')
 
-client = solr.createClient
-  host: '192.168.144.1'
+if config.HOST is 'localhost'
+  client = solr.createClient()
+else
+  client = solr.createClient
+    host: '192.168.144.1'
 client.autoCommit = true
 
 app.get '/companies', (req, res) ->

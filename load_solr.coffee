@@ -18,8 +18,11 @@ callback = (err, res) ->
     debug 'docs', res?.response?.docs
 
 # connect to solr
-client = solr.createClient
-  host: config.HOST
+if config.HOST is 'localhost'
+  client = solr.createClient()
+else
+  client = solr.createClient
+    host: '192.168.144.1'
 
 client.autoCommit = true
 
