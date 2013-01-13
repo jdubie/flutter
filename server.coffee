@@ -17,13 +17,14 @@ else
 client.autoCommit = true
 
 app.get '/companies', (req, res) ->
-  {q, lower, upper} = req.query
+  {q, lower, upper, max} = req.query
   q ?= '*'
+  max ?= 20
 
   solrQuery = client.createQuery()
     .q(q)
     .start(0)
-    .rows(10)
+    .rows(max)
     #.rangeFilter(field: 'funding_date_dts', start: "NOW-#{lower}YEAR", end: "NOW-#{upper}YEAR")
     .sort('score desc')
 
