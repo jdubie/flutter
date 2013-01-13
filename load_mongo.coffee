@@ -69,4 +69,7 @@ new Lazy(stream)
     if companyJSON?.permalink
       if companyJSON.number_of_employees?
         if companyJSON.funding_rounds?.length > 0
-          companies.push companyJSON
+          rounds = companyJSON.funding_rounds
+          round  = rounds[rounds.length - 1]
+          if round.raised_amount?
+            companies.push companyJSON
