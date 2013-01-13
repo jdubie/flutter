@@ -1,3 +1,2 @@
-exports.HOST =
-  host: 'localhost'
-  #host: '192.168.144.1'
+exports.HOST = 'localhost'
+#exports.HOST = '192.168.144.1'

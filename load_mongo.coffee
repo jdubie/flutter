@@ -8,7 +8,7 @@ path     = require 'path'
 debug    = require 'debug'
 async    = require 'async'
 mongoose = require 'mongoose'
-expat    = require 'node-expat'
+#expat    = require 'node-expat'
 S        = require 'string'
 Lazy     = require 'lazy'
 Company  = require 'models/company'
@@ -40,8 +40,8 @@ createCompany = (company, callback) ->
     company.tags = tags
 
   # overview 
-  if company.overview
-    company.overview = parseHTML(company.overview)
+  #if company.overview
+  #  company.overview = parseHTML(company.overview)
 
   company = new Company(company)
   company.save(callback)

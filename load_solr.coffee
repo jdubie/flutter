@@ -22,7 +22,7 @@ if config.HOST is 'localhost'
   client = solr.createClient()
 else
   client = solr.createClient
-    host: '192.168.144.1'
+    host: config.HOST
 
 client.autoCommit = true
 
