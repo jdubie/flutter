@@ -32,13 +32,20 @@ schema.virtual('cat').get () ->
 schema.virtual('overview_s').get () ->
   @overview
 
+getMonthSinceRaise = (year, month) ->
+  curYear = (new Date()).getFullYear()
+  curMonth = (new Date()).getFullMonth() + 1
+  (curYear - year)*12 + (curMonth - month)
+
 schema.virtual('funding').get () ->
   result = {}
-  result.funding_amount_ls = @funding_rounds.map (round) ->
+  amounts_raised = @funding_rounds.map (round) ->
     round.raised_amount
-  result.funding_date_dts = @funding_rounds.map (round) ->
-    fundDate = new Date(round.funded_year, round.funded_day, round.funded_day)
-    fundDate.toISOString()
+  fundingDates = @funding_rounds.map (round) ->
+    months_since_raise = getMonthSinceRaise(round.funded_year, round.funded_month)
+
+  result.amount_raised_l      = _.last(amounts_raised)
+  result.months_since_raise_i = _.last(fundingDates)
   result
 
 schema.methods.toSolr = () ->
