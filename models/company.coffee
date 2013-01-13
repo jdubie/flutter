@@ -45,7 +45,7 @@ schema.virtual('funding').get () ->
   fundingDates = @funding_rounds.map (round) ->
     months_since_raise = getMonthSinceRaise(round.funded_year, round.funded_month)
 
-  result.amount_raised_l      = _.last(amounts_raised)
+  result.amount_raised_d      = _.last(amounts_raised)
   result.months_since_raise_i = _.last(fundingDates)
   result
 

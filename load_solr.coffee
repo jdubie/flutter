@@ -1,6 +1,7 @@
 debug    = require 'debug'
 mongoose = require 'mongoose'
 solr     = require 'solr-client'
+config   = require 'config'
 Company  = require 'models/company'
 
 debug = debug('solr')
@@ -18,7 +19,7 @@ callback = (err, res) ->
 
 # connect to solr
 client = solr.createClient
-  host: '192.168.144.1'
+  host: config.HOST
 
 client.autoCommit = true
 
@@ -30,7 +31,7 @@ Company
       debug 'error', err
     else
       companies = companies.map (company) -> company.toSolr()
-      debug 'companies', companies
+      #debug 'companies', companies
 
       # Add documents
       client.add(companies, callback)

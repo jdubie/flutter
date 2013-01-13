@@ -1,5 +1,6 @@
 debug    = require 'debug'
 solr     = require 'solr-client'
+config   = require 'config'
 
 debug = debug('wipe-solr')
 
@@ -14,7 +15,7 @@ callback = (err, res) ->
 
 # connect to solr
 client = solr.createClient
-  host: '192.168.144.1'
+  host: config.HOST
 
 query = '*:*'
 client.deleteByQuery(query, callback)

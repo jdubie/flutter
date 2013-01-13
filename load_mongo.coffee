@@ -13,8 +13,8 @@ S        = require 'string'
 Lazy     = require 'lazy'
 Company  = require 'models/company'
 
-#CRUNCHBASE_FILE = path.join('data', 'cbase.ndj')
-CRUNCHBASE_FILE = path.join('data', 'small.ndj')
+CRUNCHBASE_FILE = path.join('data', 'cbase.ndj')
+#CRUNCHBASE_FILE = path.join('data', 'small.ndj')
 debug = debug('load_mongo')
 
 # connect to db
@@ -67,4 +67,6 @@ new Lazy(stream)
       debug "#{lineNum}: BAD"
 
     if companyJSON?.permalink
-      companies.push companyJSON
+      if companyJSON.number_of_employees?
+        if companyJSON.funding_rounds?.length > 0
+          companies.push companyJSON
