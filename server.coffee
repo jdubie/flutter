@@ -28,4 +28,4 @@ app.get '/companys', (req, res) ->
     else
       res.json(companys: solrRes.response.docs)
 
-app.listen(8001)
+app.listen(8002)

@@ -13,8 +13,8 @@ S        = require 'string'
 Lazy     = require 'lazy'
 Company  = require 'models/company'
 
-#CRUNCHBASE_FILE = path.join('data', 'cbase_small.ndj')
-CRUNCHBASE_FILE = path.join('data', 'cbase.ndj')
+#CRUNCHBASE_FILE = path.join('data', 'cbase.ndj')
+CRUNCHBASE_FILE = path.join('data', 'small.ndj')
 debug = debug('load_mongo')
 
 # connect to db
@@ -30,51 +30,41 @@ parseHTML = (overview) ->
   p.parse(overview)
   textChunks.join('')
 
-beingCreated = 0
-created = 0
+createCompany = (company, callback) ->
+  #debug 'creating', company.permalink
 
-callback = ->
+  # tags
+  if company.tag_list?.length > 0
+    tags = company.tag_list?.split(', ')
+    tags = tags.map (tag) -> tag.trim()
+    company.tags = tags
 
-createCompany = (line) ->
+  # overview 
+  if company.overview
+    company.overview = parseHTML(company.overview)
 
-  try
-    company = JSON.parse(line)
-  catch e
-    debug "#{lineNum}: BAD"
-
-  if company?.permalink
-
-    # tags
-    if company.tag_list?.length > 0
-      tags = company.tag_list?.split(', ')
-      tags = tags.map (tag) -> tag.trim()
-      company.tags = tags
-
-    # overview 
-    if company.overview
-      company.overview = parseHTML(company.overview)
-
-    company = new Company(company)
-    company.save(callback)
-  else
-    callback()
+  company = new Company(company)
+  company.save(callback)
 
 stream = fs.createReadStream(CRUNCHBASE_FILE)
 stream.on 'end', ->
-  callback = ->
-    debug 'success'
-    mongoose.connection.close()
+  debug 'PARSED'
+  Company.remove {}, ->
+    async.map companies, createCompany, (err) ->
+      if err
+        debug 'error', err
+      else
+        debug 'success'
+      mongoose.connection.close()
 
-Company.remove {}, ->
-  lazy = new Lazy(stream)
-  lazy.lines
-    .forEach (line) ->
-      beingCreated++
-      createCompany(line)
+new Lazy(stream)
+  .lines
+  .forEach (line) ->
+    lineNum++
+    try
+      companyJSON = JSON.parse(line)
+    catch e
+      debug "#{lineNum}: BAD"
 
-#async.map lazy, createCompany, (err) ->
-#  if err
-#    debug 'error', err
-#  else
-#    debug 'success'
-#    mongoose.connection.close()
+    if companyJSON?.permalink
+      companies.push companyJSON

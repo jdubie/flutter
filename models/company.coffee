@@ -8,6 +8,7 @@ schema = mongoose.Schema
   permalink: type: String, unique: true
   tags: [String]
   name: String
+  number_of_employees: Number
   overview: String
   funding_rounds: [{
     round_code: String
@@ -34,7 +35,7 @@ schema.virtual('overview_s').get () ->
 
 getMonthSinceRaise = (year, month) ->
   curYear = (new Date()).getFullYear()
-  curMonth = (new Date()).getFullMonth() + 1
+  curMonth = (new Date()).getMonth() + 1
   (curYear - year)*12 + (curMonth - month)
 
 schema.virtual('funding').get () ->
@@ -49,7 +50,15 @@ schema.virtual('funding').get () ->
   result
 
 schema.methods.toSolr = () ->
-  _.extend {@small_image_s, @id, @name, @cat, description: @overview}, @funding
+  ob = {
+    @small_image_s
+    @id
+    @name
+    @cat
+    description: @overview
+    number_of_employees_i: @number_of_employees
+  }
+  _.extend ob, @funding
 
 schema.set('toJSON', virtuals: true)
 
