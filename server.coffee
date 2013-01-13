@@ -12,20 +12,21 @@ client = solr.createClient
   host: '192.168.144.1'
 client.autoCommit = true
 
-app.get '/companys', (req, res) ->
+app.get '/companies', (req, res) ->
   {q, lower, upper} = req.query
+  q ?= '*'
 
   solrQuery = client.createQuery()
     .q(q)
     .start(0)
     .rows(10)
-    .rangeFilter(field: 'funding_date_dts', start: "NOW-#{lower}YEAR", end: "NOW-#{upper}YEAR")
+    #.rangeFilter(field: 'funding_date_dts', start: "NOW-#{lower}YEAR", end: "NOW-#{upper}YEAR")
     .sort('score desc')
 
   client.search solrQuery, (err, solrRes) ->
     if err
       console.log(err)
     else
-      res.json(companys: solrRes.response.docs)
+      res.json(companies: solrRes.response.docs)
 
 app.listen(8002)
