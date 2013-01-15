@@ -10,6 +10,7 @@ schema = mongoose.Schema
   name: String
   number_of_employees: Number
   overview: String
+  category_code: String
   funding_rounds: [{
     round_code: String
     raised_amount: Number
@@ -26,6 +27,9 @@ schema.virtual('id').get () ->
 
 schema.virtual('small_image_s').get () ->
   @image?.available_sizes?[0]?[1]
+
+schema.virtual('category').get () ->
+  @category_code
 
 schema.virtual('cat').get () ->
   @tags
@@ -55,6 +59,7 @@ schema.methods.toSolr = () ->
     @id
     @name
     @cat
+    @category
     description: @overview
     number_of_employees_i: @number_of_employees
   }

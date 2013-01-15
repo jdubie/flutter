@@ -17,9 +17,12 @@ else
 client.autoCommit = true
 
 app.get '/companies', (req, res) ->
-  {q, lower, upper, max} = req.query
-  q ?= '*'
+  {q, max, category, lower, upper} = req.query
   max ?= 20
+  category ?= "*"
+  q ?= "*"
+  q += " " if q
+  q += "category:#{category}"
 
   solrQuery = client.createQuery()
     .q(q)
