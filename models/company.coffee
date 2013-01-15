@@ -46,14 +46,22 @@ getMonthSinceRaise = (year, month) ->
   (curYear - year)*12 + (curMonth - month)
 
 schema.virtual('funding').get () ->
-  result = {}
-  amounts_raised = @funding_rounds.map (round) ->
-    round.raised_amount
-  fundingDates = @funding_rounds.map (round) ->
-    months_since_raise = getMonthSinceRaise(round.funded_year, round.funded_month)
+  result =
+    amount_raised_d     : null
+    months_since_raise_i: null
 
-  result.amount_raised_d      = _.last(amounts_raised)
-  result.months_since_raise_i = _.last(fundingDates)
+  rounds    = @funding_rounds
+  numRounds = rounds.length
+  for i in [numRounds...0]
+    round = rounds[i-1]
+    amount_raised = round.raised_amount
+    funded_month  = round.funded_month
+    funded_year   = round.funded_year
+    if amount_raised? and funded_month? and funded_year?
+      months_since_raise = getMonthSinceRaise(funded_year, funded_month)
+      result.amount_raised_d = amount_raised
+      result.months_since_raise_i = months_since_raise
+      break
   result
 
 schema.methods.toSolr = () ->

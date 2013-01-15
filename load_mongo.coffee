@@ -97,8 +97,12 @@ new Lazy(stream)
         if companyJSON.founded_year < oldestYear
           oldestYear = companyJSON.founded_year
         if companyJSON.funding_rounds?.length > 0
-          rounds = companyJSON.funding_rounds
-          round  = rounds[rounds.length - 1]
-          if roundHasRequiredFields(round)
-            numCompanies++
-            companies.push companyJSON
+          ## get the last non-null round
+          rounds    = companyJSON.funding_rounds
+          numRounds = rounds.length
+          for i in [numRounds...0]
+            round = rounds[i - 1]
+            if roundHasRequiredFields(round)
+              numCompanies++
+              companies.push companyJSON
+              break
