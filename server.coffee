@@ -17,7 +17,7 @@ else
 client.autoCommit = true
 
 app.get '/companies', (req, res) ->
-  {q, max, category, lower, upper} = req.query
+  {q, max, category, startYear, endYear} = req.query
   max ?= 20
   category ?= "*"
   q ?= "*"
@@ -28,6 +28,7 @@ app.get '/companies', (req, res) ->
     .q(q)
     .start(0)
     .rows(max)
+    .rangeFilter(field: 'founded_year_i', start: startYear, end: endYear)
     #.rangeFilter(field: 'funding_date_dts', start: "NOW-#{lower}YEAR", end: "NOW-#{upper}YEAR")
     .sort('score desc')
 

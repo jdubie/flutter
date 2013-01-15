@@ -23,6 +23,7 @@ mongoose.connect('mongodb://localhost/cbase')
 lineNum = 0
 numCompanies = 0
 companies = []
+oldestYear = 2013
 
 parseHTML = (overview) ->
   p = expat.createParser()
@@ -56,7 +57,31 @@ stream.on 'end', ->
         debug 'error', err
       else
         debug "success: #{numCompanies} companies"
+        debug "oldest: #{oldestYear}"
       mongoose.connection.close()
+
+companyHasRequiredFields = (company) ->
+  fields = [
+    'permalink'
+    'number_of_employees'
+    'founded_year'
+  ]
+  for field in fields
+    if not company[field]?
+      return false
+  true
+
+roundHasRequiredFields = (round) ->
+  fields = [
+    'raised_amount'
+    'funded_year'
+    'funded_month'
+    'funded_day'
+  ]
+  for field in fields
+    if not round[field]?
+      return false
+  true
 
 new Lazy(stream)
   .lines
@@ -67,11 +92,13 @@ new Lazy(stream)
     catch e
       debug "#{lineNum}: BAD"
 
-    if companyJSON?.permalink
-      if companyJSON.number_of_employees?
+    if companyJSON?
+      if companyHasRequiredFields(companyJSON)
+        if companyJSON.founded_year < oldestYear
+          oldestYear = companyJSON.founded_year
         if companyJSON.funding_rounds?.length > 0
           rounds = companyJSON.funding_rounds
           round  = rounds[rounds.length - 1]
-          if round.raised_amount? and round.funded_year? and round.funded_month? and round.funded_day?
+          if roundHasRequiredFields(round)
             numCompanies++
             companies.push companyJSON

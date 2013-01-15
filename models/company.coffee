@@ -19,6 +19,9 @@ schema = mongoose.Schema
     funded_month: Number
     funded_day: Number
   }]
+  founded_year: Number
+  founded_month: Number
+  founded_day: Number
   image:
     available_sizes: []
 
@@ -60,6 +63,7 @@ schema.methods.toSolr = () ->
     @name
     @cat
     @category
+    founded_year_i: @founded_year
     description: @overview
     number_of_employees_i: @number_of_employees
   }
