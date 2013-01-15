@@ -21,6 +21,7 @@ debug = debug('load_mongo')
 mongoose.connect('mongodb://localhost/cbase')
 
 lineNum = 0
+numCompanies = 0
 companies = []
 
 parseHTML = (overview) ->
@@ -54,7 +55,7 @@ stream.on 'end', ->
       if err
         debug 'error', err
       else
-        debug 'success'
+        debug "success: #{numCompanies} companies"
       mongoose.connection.close()
 
 new Lazy(stream)
@@ -71,5 +72,6 @@ new Lazy(stream)
         if companyJSON.funding_rounds?.length > 0
           rounds = companyJSON.funding_rounds
           round  = rounds[rounds.length - 1]
-          if round.raised_amount?
+          if round.raised_amount? and round.funded_year? and round.funded_month? and round.funded_day?
+            numCompanies++
             companies.push companyJSON
