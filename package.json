@@ -9,7 +9,7 @@
     "mongoose": "*",
     "async": "*",
     "string": "*",
-    "node-expat": "*",
+    "node-expat": "1.6.1",
     "express": "*",
     "isodate": "*",
     "underscore": "*"
