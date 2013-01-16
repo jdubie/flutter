@@ -18,6 +18,12 @@ schema = mongoose.Schema
     funded_year: Number
     funded_month: Number
     funded_day: Number
+    investments: [{
+      financial_org: {
+        name: String
+        permalink: String
+      }
+    }]
   }]
   founded_year: Number
   founded_month: Number
@@ -39,6 +45,17 @@ schema.virtual('cat').get () ->
 
 schema.virtual('overview_s').get () ->
   @overview
+
+schema.virtual('investors_txt').get () ->
+  investors = []
+  for round in @funding_rounds
+    for investment in round.investments
+      if investment.financial_org?.name?
+        investor = investment.financial_org.name
+        index = _(investors).sortedIndex(investor)
+        investors.splice(index, 0, investor)
+  investors = _(investors).uniq(true)
+  investors
 
 getMonthSinceRaise = (year, month) ->
   curYear = (new Date()).getFullYear()
@@ -71,6 +88,7 @@ schema.methods.toSolr = () ->
     @name
     @cat
     @category
+    @investors_txt
     founded_year_i: @founded_year
     description: @overview
     number_of_employees_i: @number_of_employees
