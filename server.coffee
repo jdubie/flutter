@@ -17,12 +17,14 @@ else
 client.autoCommit = true
 
 app.get '/companies', (req, res) ->
-  {q, max, category, startYear, endYear} = req.query
+  {q, max, category, startYear, endYear, investors} = req.query
   max ?= 20
   category ?= "*"
+  investors ?= "*"
   q ?= "*"
   q += " " if q
   q += "category:#{category}"
+  q += " investors_txt:#{investors}"
 
   solrQuery = client.createQuery()
     .q(q)
