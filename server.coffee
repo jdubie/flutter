@@ -25,6 +25,8 @@ app.get '/companies', (req, res) ->
   q += " " if q
   q += "category:#{category}"
   q += " investors_txt:#{investors}"
+  startYear ?= "*"
+  endYear ?= "*"
 
   solrQuery = client.createQuery()
     .q(q)
