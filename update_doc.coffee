@@ -31,7 +31,7 @@ async.waterfall [
     client.deleteByID doc.id, next
   (res, next) ->
     debug 'updating doc:', doc
-    for key, value in fieldChanges
+    for key, value of fieldChanges
       doc[key] = value
     delete doc._version_
     client.add doc, next
