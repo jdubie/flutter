@@ -18,4 +18,9 @@ server:
 		DEBUG=server \
 		coffee server.coffee
 
+update-doc:
+	NODE_PATH=. \
+		DEBUG=update-doc \
+		coffee update_doc.coffee
+
 .PHONY: load
